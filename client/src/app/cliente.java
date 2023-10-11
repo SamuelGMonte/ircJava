@@ -31,7 +31,7 @@ public class cliente {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Escolha seu nome de usuário: ");
+            System.out.println("Bem vindo! Digite /nick para colocar um nickname: ");
             String nick = scanner.nextLine();
 
             while(true) {
@@ -42,6 +42,7 @@ public class cliente {
                     break;
                 }
                 writer.write(nick);
+                writer.newLine();
                 writer.write(mensagem);
                 writer.newLine();
                 writer.flush();

@@ -6,54 +6,53 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
 
 public class servidor {
 
     public static void main(String[] args) {
+
         try {
             createServerSocket socketClass = new createServerSocket();
             socketClass.setPort(12345);
             int porta = socketClass.getPort();
             ServerSocket serverSocket = new ServerSocket(porta);
 
-            System.out.println("Servidor aguardando na porta 12345");
-
+            System.out.println("Servidor aguardando conexão na porta 12345");
+            String nickname = "";
+            String lastMessage = null;
+            User user = new User();
+            user.setUserNick(nickname);
             while(true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Cliente de ip " + clientSocket.getInetAddress() + " conectado.");
                 InputStream inputStream = clientSocket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String[] commands = {"help", "nick"};
-                Set<String> validCommands = new HashSet<>(Arrays.asList("help", "nick"));
-                String texto;
-                String nick = null;
-
                 try {
-                    while ((texto = reader.readLine()) != null) {
-                        if (nick == null) {
-                            int index = texto.indexOf('\n');
-                            if(index != -1) {
-                                nick = texto.substring(0, index).trim();
-                                System.out.println("nick como: " + nick);
+                    String nick = reader.readLine();
+                    while (true) {
+                        String texto = reader.readLine();
+                        String[] tokens = texto.split(" ");
+                        if(texto.isEmpty()) {
+                            continue;
+                        }
+                        else if(texto.startsWith("/nick")) {
+                            if(tokens.length > 1) {
+                                String newNick = tokens[1];
+                                if (!validadeNick.existNick(user, newNick)) {
+                                    user.setUserNick(newNick);
+                                    nick = user.getUserNick();
+                                } else {
+                                    System.out.println("Nickname inválido");
+                                }
                             }
                             else {
-                                System.out.println(nick + " disse " + texto.substring(nick.length()));
+                                System.out.println("Nickname ja existente");
                             }
                         }
-                        if(validCommands.contains(texto))
-                            if (texto.startsWith("help")) {
-                                System.out.println("Comandos disponiveis:");
-                                System.out.println("help");
-                                System.out.println("nick");
-                                continue;
-                            }
-
-
+                        else if(!texto.equals(nick)) {
+                            System.out.println(nick + " disse " + texto);
+                        }
                     }
                 } catch (IOException e) {
                     System.out.println("Cliente de IP " + clientSocket.getInetAddress() + " desconectado forçadamente.");
