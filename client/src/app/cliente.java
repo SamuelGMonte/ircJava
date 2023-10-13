@@ -32,8 +32,16 @@ public class cliente {
 
             Scanner scanner = new Scanner(System.in);
             System.out.println("Bem vindo! Digite /nick para colocar um nickname: ");
-            String nick = scanner.nextLine();
-
+            String nick = "";
+            while(true) {
+                nick = scanner.nextLine();
+                if(nick.startsWith("/nick") ) {
+                    break;
+                }
+                else {
+                    System.err.println("Saindo... Nick não fornecido.");
+                }
+            }
             while(true) {
                 System.out.println("envie a mensagem: ");
                 String mensagem = scanner.nextLine();
@@ -47,7 +55,7 @@ public class cliente {
                 writer.newLine();
                 writer.flush();
             }
-
+            scanner.close();
             writer.close();
             outputStreamWriter.close();
             outputStream.close();

@@ -20,6 +20,7 @@ public class servidor {
 
             System.out.println("Servidor aguardando conexão na porta 12345");
             String nickname = "";
+            String nick = "";
             String lastMessage = null;
             User user = new User();
             user.setUserNick(nickname);
@@ -29,19 +30,19 @@ public class servidor {
                 InputStream inputStream = clientSocket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 try {
-                    String nick = reader.readLine();
+                    while (true) {
+                        nick = reader.readLine().replaceAll("/nick", "");
+                        break;
+                    }
                     while (true) {
                         String texto = reader.readLine();
                         String[] tokens = texto.split(" ");
-                        if(texto.isEmpty()) {
-                            continue;
-                        }
-                        else if(texto.startsWith("/nick")) {
+                        if(texto.startsWith("/nick")) {
                             if(tokens.length > 1) {
                                 String newNick = tokens[1];
                                 if (!validadeNick.existNick(user, newNick)) {
-                                    user.setUserNick(newNick);
-                                    nick = user.getUserNick();
+                                    user.setUserNick(nick);
+                                    nickname = user.getUserNick();
                                 } else {
                                     System.out.println("Nickname inválido");
                                 }
