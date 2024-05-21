@@ -8,21 +8,23 @@ import java.net.*;
 import java.util.Scanner;
 
 
-public class cliente {
+public class Cliente {
     public static void main(String[] args) {
-        createServerSocket socketClass = new createServerSocket();
+        CreateServerSocket socketClass = new CreateServerSocket();
 
         try {
 
             InetAddress localHost = InetAddress.getLocalHost();
-            String ipAddress = localHost.getHostAddress();
+            // String ipAddress = localHost.getHostAddress();
 
-            socketClass.setIpStr(ipAddress);
             socketClass.setPort(12345);
+            // System.out.println(ipAddress);
             int port = socketClass.getPort();
-            String ipAddressStr = socketClass.getIpStr();
 
-            Socket clientSocket = new Socket(ipAddressStr, port);
+            // String ipAddressStr = socketClass.getIpStr();
+            socketClass.setIp(localHost);
+            System.out.println(localHost.getHostAddress());
+            Socket clientSocket = new Socket(localHost.getHostAddress(), port);
 
             OutputStream outputStream = clientSocket.getOutputStream();
 
@@ -33,9 +35,9 @@ public class cliente {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Bem vindo! Digite /nick para colocar um nickname: ");
             String nick = "";
-            while(true) {
-                nick = scanner.nextLine();
+            while((nick = scanner.nextLine()) != null) {
                 if(nick.startsWith("/nick") ) {
+                    System.err.println("Seu Nick é: " + nick);
                     break;
                 }
                 else {

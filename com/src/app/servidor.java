@@ -8,15 +8,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class servidor {
+public class Servidor {
 
     public static void main(String[] args) {
+        ServerSocket socketClass;
 
         try {
-            createServerSocket socketClass = new createServerSocket();
-            socketClass.setPort(12345);
-            int porta = socketClass.getPort();
-            ServerSocket serverSocket = new ServerSocket(porta);
+            socketClass = new ServerSocket(12345);
 
             System.out.println("Servidor aguardando conexão na porta 12345");
             String nickname = "";
@@ -25,39 +23,42 @@ public class servidor {
             User user = new User();
             user.setUserNick(nickname);
             while(true) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = socketClass.accept();
                 System.out.println("Cliente de ip " + clientSocket.getInetAddress() + " conectado.");
+
+                ClienteThread clientSock = new ClienteThread(clientSocket);
+                new Thread(clientSock).start();
+
                 InputStream inputStream = clientSocket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                try {
-                    while (true) {
-                        nick = reader.readLine().replaceAll("/nick", "");
-                        break;
-                    }
-                    while (true) {
-                        String texto = reader.readLine();
-                        String[] tokens = texto.split(" ");
-                        if(texto.startsWith("/nick")) {
-                            if(tokens.length > 1) {
-                                String newNick = tokens[1];
-                                if (!validadeNick.existNick(user, newNick)) {
-                                    user.setUserNick(nick);
-                                    nickname = user.getUserNick();
-                                } else {
-                                    System.out.println("Nickname inválido");
-                                }
-                            }
-                            else {
-                                System.out.println("Nickname ja existente");
-                            }
-                        }
-                        else if(!texto.equals(nick)) {
-                            System.out.println(nick + " disse " + texto);
-                        }
-                    }
-                } catch (IOException e) {
-                    System.out.println("Cliente de IP " + clientSocket.getInetAddress() + " desconectado forçadamente.");
+                
+
+                nick = reader.readLine();
+                if (nick.contains("/nick")) {
+                    nick.replaceAll("/nick", "");
                 }
+
+                String texto = reader.readLine();
+                String[] tokens = texto.split(" ");
+
+                if(texto.startsWith("/nick")) {
+                    if(tokens.length > 1) {
+                        String newNick = tokens[1];
+                        if (!validadeNick.existNick(user, newNick)) {
+                            user.setUserNick(nick);
+                            nickname = user.getUserNick();
+                        } else {
+                            System.out.println("Nickname inválido");
+                        }
+                    }
+                    else {
+                        System.out.println("Nickname ja existente");
+                    }
+                }
+                else if(!texto.equals(nick)) {
+                    System.out.println(nick + " disse " + texto);
+                }
+    
                 reader.close();
                 clientSocket.close();
             }
